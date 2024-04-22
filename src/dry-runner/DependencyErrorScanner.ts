@@ -35,20 +35,10 @@ export class DependencyErrorScanner {
       myTokens.concat(importsTokens).map((t) => t.token),
     );
 
-    moduleMetadata.providers?.forEach((provider) => {
-      MetadataExtractor.extractTokens(provider).forEach((token) => {
-        if (!availableTokens.has(token)) {
-          this.dependencyErrorContainer.add({ from: provider, need: token });
-        }
-      });
-    });
-
-    moduleMetadata.controllers?.forEach((controller) => {
-      MetadataExtractor.extractTokens(controller).forEach((token) => {
-        if (!availableTokens.has(token)) {
-          this.dependencyErrorContainer.add({ from: controller, need: token });
-        }
-      });
+    this.tokenReferenceContainer.get(module).forEach((token) => {
+      if (!availableTokens.has(token)) {
+        this.dependencyErrorContainer.add({ from: module, need: token });
+      }
     });
 
     this.visited.add(module);

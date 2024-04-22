@@ -25,8 +25,23 @@ export class TokenReferenceScanner {
       this.getTokenReferencesFromProvider(provider).forEach(
         (tokenReference) => {
           this.container.add(module, tokenReference);
+          if (typeof tokenReference === 'object') {
+            MetadataExtractor.extractTokens(tokenReference).forEach((token) => {
+              this.container.add(module, token);
+            });
+          }
         },
       );
+
+      MetadataExtractor.extractTokens(provider).forEach((token) => {
+        this.container.add(module, token);
+      });
+    });
+
+    moduleMetadata.controllers?.forEach((controller) => {
+      MetadataExtractor.extractTokens(controller).forEach((token) => {
+        this.container.add(module, token);
+      });
     });
   }
 
@@ -54,7 +69,7 @@ export class TokenReferenceScanner {
     };
 
     const fromClassProvider = (provider: ClassProvider): TokenReference[] => {
-      return [provider.provide];
+      return [provider.useClass];
     };
 
     if ('useExisting' in provider) {
